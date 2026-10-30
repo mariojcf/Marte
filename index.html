@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f5f0f2">
+
+  <title>MARS MATH BASE | Exploración científica</title>
+
+  <link rel="stylesheet" href="style.css">
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.164.1/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.164.1/examples/jsm/"
+    }
+  }
+  </script>
+
+  <script type="module" src="app.js"></script>
+</head>
+
+<body>
+  <header class="encabezado">
+    <div class="marca">
+      <div class="logo">M</div>
+
+      <div>
+        <h1>MARS MATH BASE</h1>
+        <p>Exploración matemática y científica de Marte</p>
+      </div>
+    </div>
+
+    <div class="estado">
+      <span class="punto-estado"></span>
+      MODELO DE EXPLORACIÓN
+    </div>
+  </header>
+
+  <main class="contenido">
+
+    <!-- ESCENA 3D Y CONTROLES -->
+    <section class="panel panel-escena">
+
+      <div class="titulo-panel">
+        <div>
+          <span class="sobretitulo">CENTRO DE CONTROL</span>
+          <h2>Superficie marciana</h2>
+          <p>Explora el terreno y controla el rover en tres dimensiones.</p>
+        </div>
+
+        <span class="etiqueta">VISTA 3D</span>
+      </div>
+
+      <div id="cargando">
+        Preparando el terreno y el rover...
+      </div>
+
+      <div
+        id="escena3d"
+        aria-label="Modelo tridimensional interactivo de Marte">
+      </div>
+
+      <div id="error3d" class="error" hidden></div>
+
+      <!-- BOTONES DEL ROVER -->
+      <div class="barra-controles">
+        <div>
+          <span class="sobretitulo">CONTROL DEL ROVER</span>
+          <p class="texto-pequeno">
+            Usa las direcciones para mover el rover por la carretera.
+          </p>
+        </div>
+
+        <div class="controles">
+
+          <button
+            id="adelante"
+            aria-label="Avanzar"
+            title="Avanzar">
+            ↑
+          </button>
+
+          <div class="fila-controles">
+
+            <button
+              id="izquierda"
+              aria-label="Girar a la izquierda"
+              title="Girar a la izquierda">
+              ←
+            </button>
+
+            <button
+              id="detener"
+              class="boton-detener"
+              aria-label="Detener"
+              title="Detener">
+              ■
+            </button>
+
+            <button
+              id="derecha"
+              aria-label="Girar a la derecha"
+              title="Girar a la derecha">
+              →
+            </button>
+
+          </div>
+
+          <button
+            id="atras"
+            aria-label="Retroceder"
+            title="Retroceder">
+            ↓
+          </button>
+
+        </div>
+      </div>
+
+      <!-- COORDENADAS Y ESTADO -->
+      <div class="estado-rover">
+
+        <div>
+          <span>Coordenada X</span>
+          <strong id="valorX">0.0</strong>
+        </div>
+
+        <div>
+          <span>Coordenada Y</span>
+          <strong id="valorY">0.0</strong>
+        </div>
+
+        <div>
+          <span>Estado</span>
+          <strong id="estadoRover">En espera</strong>
+        </div>
+
+      </div>
+
+      <p class="ayuda">
+        También puedes usar W, A, S, D o las flechas del teclado.
+        Arrastra el ratón para girar la cámara y usa la rueda para
+        acercar o alejar la vista. El terreno es una representación educativa.
+      </p>
+
+    </section>
+
+    <!-- PANEL LATERAL DE INFORMACIÓN -->
+    <aside class="columna">
+
+      <section class="panel panel-informacion">
+
+        <div class="encabezado-informacion">
+          <span class="sobretitulo">PANEL DE INFORMACIÓN</span>
+          <h2>Explora el proyecto</h2>
+          <p>Selecciona una pestaña para consultar cada sección.</p>
+        </div>
+
+        <!-- NAVEGACIÓN -->
+        <div
+          class="navegacion-pestanas"
+          role="tablist"
+          aria-label="Secciones del proyecto">
+
+          <button
+            class="pestana activa"
+            id="tab-marte"
+            role="tab"
+            aria-selected="true"
+            aria-controls="contenido-marte"
+            data-pestana="contenido-marte">
+            Marte
+          </button>
+
+          <button
+            class="pestana"
+            id="tab-terreno"
+            role="tab"
+            aria-selected="false"
+            aria-controls="contenido-terreno"
+            data-pestana="contenido-terreno">
+            Terreno
+          </button>
+
+          <button
+            class="pestana"
+            id="tab-rover"
+            role="tab"
+            aria-selected="false"
+            aria-controls="contenido-rover"
+            data-pestana="contenido-rover">
+            Rover
+          </button>
+
+          <button
+            class="pestana"
+            id="tab-base"
+            role="tab"
+            aria-selected="false"
+            aria-controls="contenido-base"
+            data-pestana="contenido-base">
+            Base
+          </button>
+
+          <button
+            class="pestana"
+            id="tab-calculos"
+            role="tab"
+            aria-selected="false"
+            aria-controls="contenido-calculos"
+            data-pestana="contenido-calculos">
+            Cálculos
+          </button>
+
+        </div>
+
+        <!-- PESTAÑA MARTE -->
+        <div
+          id="contenido-marte"
+          class="contenido-pestana"
+          role="tabpanel"
+          aria-labelledby="tab-marte">
+
+          <div class="ilustracion-marte">
+            <div class="planeta"></div>
+            <div class="orbita orbita-uno"></div>
+            <div class="orbita orbita-dos"></div>
+
+            <span class="estrella estrella-uno">✦</span>
+            <span class="estrella estrella-dos">✧</span>
+          </div>
+
+          <span class="etiqueta-seccion">EL PLANETA ROJO</span>
+
+          <h3>Marte</h3>
+
+          <p>
+            Marte es un planeta rocoso con cráteres, montañas, valles
+            y una superficie rica en materiales oxidados.
+          </p>
+
+          <div class="dato">
+            <span>Radio medio</span>
+            <strong>3,389.5 km</strong>
+          </div>
+
+          <div class="dato">
+            <span>Gravedad superficial</span>
+            <strong>3.71 m/s²</strong>
+          </div>
+
+          <div class="dato">
+            <span>Duración del día</span>
+            <strong>24 h 37 min</strong>
+          </div>
+
+          <div class="dato">
+            <span>Temperatura media</span>
+            <strong>−55 °C</strong>
+          </div>
+
+          <div class="nota">
+            Los datos corresponden al planeta. Las dimensiones de la
+            base representada son decisiones de diseño de esta simulación.
+          </div>
+
+        </div>
+
+        <!-- PESTAÑA TERRENO -->
+        <div
+          id="contenido-terreno"
+          class="contenido-pestana"
+          role="tabpanel"
+          aria-labelledby="tab-terreno"
+          hidden>
+
+          <span class="etiqueta-seccion">SUPERFICIE Y RELIEVE</span>
+
+          <h3>Análisis del terreno</h3>
+
+          <p>
+            La superficie se representa con una función de dos variables.
+            Sus cambios de altura permiten estudiar pendientes y relieve.
+          </p>
+
+          <div class="formula">
+            <strong>Función original del proyecto</strong>
+
+            <p>
+              f(x,y) = 20 + 8e<sup>−((x−3)²+(y−7)²)/4</sup>
+              − 6e<sup>−((x−7)²+(y−3)²)/4</sup>
+              + 0.5x + 0.3y
+            </p>
+          </div>
+
+          <div class="dato">
+            <span>Dominio de X</span>
+            <strong>0 a 10</strong>
+          </div>
+
+          <div class="dato">
+            <span>Dominio de Y</span>
+            <strong>0 a 10</strong>
+          </div>
+
+          <h4>Elementos visibles</h4>
+
+          <label class="opcion">
+            <input type="checkbox" id="verTerreno" checked>
+            <span>Terreno y curvas de nivel</span>
+          </label>
+
+          <label class="opcion">
+            <input type="checkbox" id="verRuta" checked>
+            <span>Ruta del rover</span>
+          </label>
+
+          <label class="opcion">
+            <input
+              type="checkbox"
+              id="verTrayectoriaMatematica"
+              checked>
+            <span>
+              Trayectoria matemática del informe (referencia)
+            </span>
+          </label>
+
+          <div class="nota nota-azul">
+            El relieve del modelo es matemático y educativo; no es
+            un mapa topográfico real obtenido de una misión espacial.
+          </div>
+
+        </div>
+
+        <!-- PESTAÑA ROVER -->
+        <div
+          id="contenido-rover"
+          class="contenido-pestana"
+          role="tabpanel"
+          aria-labelledby="tab-rover"
+          hidden>
+
+          <span class="etiqueta-seccion">VEHÍCULO EXPLORADOR</span>
+
+          <h3>Rover marciano</h3>
+
+          <p>
+            El rover es un vehículo robótico que permite recorrer la
+            superficie, estudiar el terreno y explorar zonas de interés.
+          </p>
+
+          <div class="tarjeta-coordenadas">
+
+            <div>
+              <span>Posición X</span>
+              <strong id="valorX2">0.0</strong>
+            </div>
+
+            <div>
+              <span>Posición Y</span>
+              <strong id="valorY2">0.0</strong>
+            </div>
+
+          </div>
+
+          <div class="dato">
+            <span>Movimiento</span>
+            <strong>Interactivo</strong>
+          </div>
+
+          <div class="dato">
+            <span>Control</span>
+            <strong>Botones y teclado</strong>
+          </div>
+
+          <label class="opcion">
+            <input type="checkbox" id="verRover" checked>
+            <span>Mostrar rover</span>
+          </label>
+
+          <button id="reiniciar" class="boton-principal">
+            Reiniciar rover y cámara
+          </button>
+
+          <div class="nota nota-azul">
+            Usa ↑ o W para avanzar y ↓ o S para retroceder siguiendo
+            la carretera. Las flechas laterales giran la orientación
+            sin sacar el rover de la vía. Pulsa detener para parar el vehículo.
+          </div>
+
+        </div>
+
+        <!-- PESTAÑA BASE -->
+        <div
+          id="contenido-base"
+          class="contenido-pestana"
+          role="tabpanel"
+          aria-labelledby="tab-base"
+          hidden>
+
+          <span class="etiqueta-seccion">INSTALACIÓN CIENTÍFICA</span>
+
+          <h3>Base de exploración</h3>
+
+          <p>
+            La base representa un espacio conceptual de apoyo para las
+            operaciones científicas y el suministro de energía.
+          </p>
+
+          <label class="opcion">
+            <input type="checkbox" id="verBase" checked>
+            <span>Módulos de la base</span>
+          </label>
+
+          <label class="opcion">
+            <input type="checkbox" id="verPaneles" checked>
+            <span>Paneles solares</span>
+          </label>
+
+          <div class="dato">
+            <span>Instalación</span>
+            <strong>Módulos científicos</strong>
+          </div>
+
+          <div class="dato">
+            <span>Energía conceptual</span>
+            <strong>Paneles solares</strong>
+          </div>
+
+          <div class="dato">
+            <span>Comunicación</span>
+            <strong>Antena</strong>
+          </div>
+
+          <div class="nota">
+            Las posiciones y los tamaños de estos objetos son decisiones
+            de diseño de la simulación, no especificaciones de una misión real.
+          </div>
+
+          <div class="dato">
+            <span>Recurso representado</span>
+            <strong>Hielo de agua bajo la superficie</strong>
+          </div>
+
+          <p>
+            La zona azul, el taladro y las tuberías son una propuesta
+            educativa de exploración y transporte de agua; no representan
+            una instalación real ni confirman hielo en estas coordenadas.
+          </p>
+
+          <div class="nota nota-azul">
+            <strong>Referencia científica NASA:</strong>
+            el radar SHARAD de Mars Reconnaissance Orbiter estudia
+            estructuras del subsuelo y ha detectado depósitos interpretados
+            como ricos en hielo de agua en algunas regiones.
+
+            <a
+              href="https://science.nasa.gov/resource/radargrams-indicating-ice-rich-subsurface-deposit/"
+              target="_blank"
+              rel="noopener noreferrer">
+              Ver datos de NASA sobre depósitos subterráneos de hielo
+            </a>.
+
+            <br><br>
+
+            <a
+              href="https://astrobiology.nasa.gov/missions/mro/"
+              target="_blank"
+              rel="noopener noreferrer">
+              Más información de NASA sobre Mars Reconnaissance Orbiter
+            </a>.
+          </div>
+
+        </div>
+
+        <!-- PESTAÑA CÁLCULOS -->
+        <div
+          id="contenido-calculos"
+          class="contenido-pestana"
+          role="tabpanel"
+          aria-labelledby="tab-calculos"
+          hidden>
+
+          <span class="etiqueta-seccion">MATEMÁTICA APLICADA</span>
+
+          <h3>Cálculos del proyecto</h3>
+
+          <p>
+            El proyecto utiliza herramientas de cálculo multivariable
+            para analizar la superficie y estudiar el recorrido del rover.
+          </p>
+
+          <div class="dato">
+            <span>Función de dos variables</span>
+            <strong>f(x,y)</strong>
+          </div>
+
+          <div class="dato">
+            <span>Trayectoria vectorial del informe</span>
+            <strong>
+              r(t) = (2 + 5 cos t, −3 + 5 sin t, 4)
+            </strong>
+          </div>
+
+          <div class="dato">
+            <span>Esfera de referencia</span>
+            <strong>Centro (2, −3, 4), radio 5</strong>
+          </div>
+
+          <div class="nota nota-azul">
+            La carretera operativa de la maqueta y la trayectoria circular
+            matemática se muestran por separado: el rover circula por la
+            carretera del terreno, mientras que la línea rosa representa
+            la función vectorial del informe.
+          </div>
+
+          <div class="dato">
+            <span>Derivadas parciales</span>
+            <strong>fₓ y fᵧ</strong>
+          </div>
+
+          <div class="dato">
+            <span>Gradiente</span>
+            <strong>∇f</strong>
+          </div>
+
+          <div class="dato">
+            <span>Plano tangente</span>
+            <strong>z = L(x,y)</strong>
+          </div>
+
+          <div class="dato">
+            <span>Optimización</span>
+            <strong>Puntos críticos</strong>
+          </div>
+
+          <div class="dato">
+            <span>Integración</span>
+            <strong>Integrales dobles y triples</strong>
+          </div>
+
+          <div class="nota nota-azul">
+            Esta sección resume los temas matemáticos. Los resultados
+            numéricos completos deben conservarse según el informe del proyecto.
+          </div>
+
+        </div>
+
+      </section>
+
+    </aside>
+
+  </main>
+
+  <!-- PIE DE PÁGINA -->
+  <footer>
+    <strong>MARS MATH BASE</strong>
+    <span>Proyecto de Matemática IV · Exploración matemática de Marte</span>
+  </footer>
+
+</body>
+</html>
